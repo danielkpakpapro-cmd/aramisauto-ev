@@ -1,5 +1,4 @@
-playwright>=1.44
-pandas>=2.0
+﻿pandas>=2.0
 streamlit>=1.35
 plotly>=5.20
 streamlit-autorefresh>=1.0.1
