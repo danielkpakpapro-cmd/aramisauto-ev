@@ -1,19 +1,10 @@
 ﻿"""
-dashboard.py — Aramisauto uniquement
-======================================
-Lit data/historique.csv (genere par scraper.py) et affiche :
-  - la proportion electrique par marque au dernier releve,
-  - l'evolution de cette proportion dans le temps.
-
-Lancement :
-    pip install streamlit pandas plotly --break-system-packages
-    streamlit run dashboard.py
+dashboard.py - Aramisauto uniquement
+Lit data/historique.csv, mis a jour automatiquement chaque jour par
+GitHub Actions (voir .github/workflows/scraping.yml).
 """
 
 import os
-import subprocess
-import sys
-import time
 
 import pandas as pd
 import plotly.express as px
@@ -21,58 +12,8 @@ import streamlit as st
 
 CSV_PATH = "data/historique.csv"
 
-st.set_page_config(page_title="Aramisauto — proportion electrique", layout="wide")
-st.title("Aramisauto — proportion de vehicules electriques par marque")
-
-st.sidebar.header("Actualisation")
-
-auto_refresh = st.sidebar.checkbox("Auto-actualiser l'affichage", value=False)
-if auto_refresh:
-    interval_min = st.sidebar.slider("Toutes les (minutes)", 1, 60, 5)
-    st.sidebar.caption(
-        "Relit simplement le CSV toutes les X minutes."
-    )
-    try:
-        from streamlit_autorefresh import st_autorefresh
-        st_autorefresh(interval=interval_min * 60 * 1000, key="auto_refresh_timer")
-    except ImportError:
-        st.sidebar.warning(
-            "Package manquant : pip install streamlit-autorefresh --break-system-packages"
-        )
-
-st.sidebar.divider()
-st.sidebar.caption(
-    "Scraping en direct (30s, par marque). Pour le detail par modele, "
-    "lance python scraper_modeles.py separement (20-30 min)."
-)
-
-try:
-    import playwright  # noqa: F401
-    playwright_available = True
-except ImportError:
-    playwright_available = False
-
-if not playwright_available:
-    st.sidebar.info(
-        "Scraping manuel indisponible ici (app deployee sans Playwright, "
-        "volontairement, pour rester legere). Le scraping tourne en local "
-        "sur ta machine et pousse les mises a jour via push_update.ps1."
-    )
-elif st.sidebar.button("Lancer un scraping maintenant"):
-    with st.spinner("Scraping en cours (30 secondes)..."):
-        result = subprocess.run(
-            [sys.executable, "scraper.py"],
-            capture_output=True, text=True, timeout=180,
-        )
-        if result.returncode == 0:
-            st.sidebar.success("Termine !")
-            with st.sidebar.expander("Details"):
-                st.code(result.stdout)
-            time.sleep(1)
-            st.rerun()
-        else:
-            st.sidebar.error("Echec du scraping :")
-            st.sidebar.code(result.stdout + "\n" + result.stderr)
+st.set_page_config(page_title="Aramisauto - proportion electrique", layout="wide")
+st.title("Aramisauto - proportion de vehicules electriques par marque")
 
 if not os.path.exists(CSV_PATH):
     st.warning(f"Aucune donnee trouvee ({CSV_PATH}). Lance python scraper.py.")
@@ -136,4 +77,4 @@ else:
     st.plotly_chart(fig_evo, use_container_width=True)
 
 st.divider()
-st.caption("Deux facons d'avoir des donnees a jour : auto-actualisation ou bouton manuel (local uniquement).")
+st.caption("Les donnees sont mises a jour automatiquement une fois par jour (GitHub Actions).")
