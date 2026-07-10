@@ -73,8 +73,8 @@ fig = px.bar(
     labels={"proportion_electrique": "% électrique", "marque": "Marque"},
     text="nb_electrique",
 )
-fig.update_traces(texttemplate="%{text}", textposition="outside")
-fig.update_yaxes(tickformat=".0%")
+fig.update_traces(texttemplate="%{text}", textposition="outside", textfont=dict(color="white", size=13))
+fig.update_yaxes(tickformat=".0%", range=[0, latest["proportion_electrique"].max() * 1.15 + 0.05])
 st.plotly_chart(fig, use_container_width=True)
 
 st.subheader("Détail par marque")
