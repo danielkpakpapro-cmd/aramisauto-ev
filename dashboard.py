@@ -71,7 +71,9 @@ fig = px.bar(
     latest, x="marque", y="proportion_electrique",
     hover_data=["nb_total", "nb_electrique"],
     labels={"proportion_electrique": "% électrique", "marque": "Marque"},
+    text="nb_electrique",
 )
+fig.update_traces(texttemplate="%{text}", textposition="outside")
 fig.update_yaxes(tickformat=".0%")
 st.plotly_chart(fig, use_container_width=True)
 
